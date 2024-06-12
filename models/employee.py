@@ -22,3 +22,15 @@ class Employee(Base):
     updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
 
     user = relationship('User', back_populates='employee')
+
+    def to_dict(self):
+        """Converts the Employee instance to a dictionary."""
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "company_name": self.company_name,
+            "website": self.website,
+            "contact_info": self.contact_info,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()
+        }

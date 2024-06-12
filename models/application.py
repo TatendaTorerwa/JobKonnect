@@ -25,3 +25,16 @@ class Application(Base):
 
     job = relationship('Job', back_populates='applications')
     user = relationship('User', back_populates='applications')
+
+    def to_dict(self):
+        """Converts the Application instance to a dictionary."""
+        return {
+            "id": self.id,
+            "job_id": self.job_id,
+            "user_id": self.user_id,
+            "resume": self.resume,
+            "cover_letter": self.cover_letter,
+            "status": self.status,
+            "submitted_at": self.submitted_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()
+        }

@@ -5,6 +5,7 @@ import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from base import Base
+import bcrypt
 
 class User(Base):
     """Represents of User."""
@@ -22,5 +23,31 @@ class User(Base):
     first_name = Column(String(50))
     last_name = Column(String(50))
     phone_number = Column(String(15))
-    address = Column(String(255)) 
+    address = Column(String(255))
 
+    def to_dict(self):
+    """Converts the User instance to a dictionary."""
+    return {
+        "id": self.id,
+        "username": self.username,
+        "password": self.password,
+        "email": self.email,
+        "role": self.role,
+        "created_at": self.created_at.isoformat(),
+        "updated_at": self.updated_at.isoformat(),
+        "first_name": self.first_name,
+        "last_name": self.last_name,
+        "phone_number": self.phone_number,
+        "address": self.address
+    }
+
+
+    def set_password(self, password):
+        """Hashes and sets the user's password."""
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+        self.password = hashed_password.decode('utf-8')
+
+    def check_password(self, password):
+        """Verifies the provided password against the hashed password."""
+        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))

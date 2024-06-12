@@ -29,3 +29,21 @@ class Job(Base):
 
 
     employer = relationship('User', back_populates='jobs')
+
+    def to_dict(self):
+        """Converts the Job instance to a dictionary."""
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "requirements": self.requirements,
+            "employer_id": self.employer_id,
+            "salary": self.salary,
+            "location": self.location,
+            "job_type": self.job_type,
+            "application_deadline": str(self.application_deadline),
+            "skills_required": self.skills_required,
+            "preferred_qualifications": self.preferred_qualifications,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()
+        }
