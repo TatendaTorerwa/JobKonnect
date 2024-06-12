@@ -26,20 +26,20 @@ class User(Base):
     address = Column(String(255))
 
     def to_dict(self):
-    """Converts the User instance to a dictionary."""
-    return {
-        "id": self.id,
-        "username": self.username,
-        "password": self.password,
-        "email": self.email,
-        "role": self.role,
-        "created_at": self.created_at.isoformat(),
-        "updated_at": self.updated_at.isoformat(),
-        "first_name": self.first_name,
-        "last_name": self.last_name,
-        "phone_number": self.phone_number,
-        "address": self.address
-    }
+        """Converts the User instance to a dictionary."""
+        return {
+            "id": self.id,
+            "username": self.username,
+            "password": self.password,
+            "email": self.email,
+            "role": self.role,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "phone_number": self.phone_number,
+            "address": self.address
+        }
 
 
     def set_password(self, password):
