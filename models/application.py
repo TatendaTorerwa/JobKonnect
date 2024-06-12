@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 from base import Base
 from models.user import User
 from models.job import Job
+from sqlalchemy.sql import func
 
 class Application(Base):
     """Represents of Application."""
@@ -19,8 +20,8 @@ class Application(Base):
     resume = Column(String(255))
     cover_letter = Column(String(255))
     status = Column(Enum('submitted', 'under review', 'rejected', 'accepted', name='status_enum'), default='submitted')
-    submitted_at = Column(TIMESTAMP, nullable=False, server_default='CURRENT_TIMESTAMP')
-    updated_at = Column(TIMESTAMP, nullable=False, server_default='CURRENT_TIMESTAMP', onupdate='CURRENT_TIMESTAMP')
+    submitted_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
 
     job = relationship('Job', back_populates='applications')
     user = relationship('User', back_populates='applications')

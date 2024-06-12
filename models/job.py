@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, For
 from sqlalchemy.orm import relationship
 from base import Base
 from models.user import User
-from models.application import Application
+from sqlalchemy.sql import func
 
 class Job(Base):
     """Represents of Job."""
@@ -24,8 +24,8 @@ class Job(Base):
     application_deadline = Column(Date)
     skills_required = Column(Text)
     preferred_qualifications = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, server_default='CURRENT_TIMESTAMP')
-    updated_at = Column(TIMESTAMP, nullable=False, server_default='CURRENT_TIMESTAMP', onupdate='CURRENT_TIMESTAMP')
+    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
+
 
     employer = relationship('User', back_populates='jobs')
-    applications = relationship('Application', back_populates='job')

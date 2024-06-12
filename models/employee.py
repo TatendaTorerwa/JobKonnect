@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, For
 from sqlalchemy.orm import relationship
 from base import Base
 from models.user import User
+from sqlalchemy.sql import func
 
 class Employee(Base):
     """Represents of Employee."""
@@ -17,7 +18,7 @@ class Employee(Base):
     company_name = Column(String(100), nullable=False)
     website = Column(String(255))
     contact_info = Column(String(255))
-    created_at = Column(TIMESTAMP, nullable=False, server_default='CURRENT_TIMESTAMP')
-    updated_at = Column(TIMESTAMP, nullable=False, server_default='CURRENT_TIMESTAMP', onupdate='CURRENT_TIMESTAMP')
+    created_at = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    updated_at = Column(TIMESTAMP, nullable=False, server_default=func.now(), onupdate=func.now())
 
     user = relationship('User', back_populates='employee')
