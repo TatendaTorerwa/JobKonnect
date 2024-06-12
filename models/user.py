@@ -4,7 +4,9 @@
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from db_connection import Base
+from base import Base
+from models.application import Application
+from models.employee import Employee
 
 class User(Base):
     """Represents of User."""
@@ -22,3 +24,6 @@ class User(Base):
     last_name = Column(String(50))
     phone_number = Column(String(15))
     address = Column(String(255)) 
+
+    applications = relationship('Application', back_populates='user')
+    employee = relationship('Employee', back_populates='user')

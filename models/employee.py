@@ -4,8 +4,8 @@
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from db_connection import Base
-from .models.user import User
+from base import Base
+from models.user import User
 
 class Employee(Base):
     """Represents of Employee."""

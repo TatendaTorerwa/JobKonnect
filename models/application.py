@@ -4,9 +4,9 @@
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, ForeignKey
 from sqlalchemy.orm import relationship
-from db_connection import Base
-from .models.user import User
-from .models.job import Job
+from base import Base
+from models.user import User
+from models.job import Job
 
 class Application(Base):
     """Represents of Application."""
