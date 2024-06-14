@@ -17,7 +17,7 @@ def index():
     """
     Endpoint for the root url.
     """
-    return jsonify({'message': 'Welcome to JobKonnect.')}
+    return jsonify({'message': 'Welcome to JobKonnect.'})
 
 """Define routes for user operations."""
 
