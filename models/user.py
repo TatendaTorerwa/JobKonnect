@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 from base import Base
 import bcrypt
 
+
 class User(Base):
     """Represents of User."""
 
@@ -20,10 +21,13 @@ class User(Base):
     created_at = Column(TIMESTAMP, nullable=False, server_default=sqlalchemy.func.now())
     updated_at = Column(TIMESTAMP, nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now())
     first_name = Column(String(50))
-    first_name = Column(String(50))
     last_name = Column(String(50))
     phone_number = Column(String(15))
     address = Column(String(255))
+    company_name = Column(String(100))
+    website = Column(String(255))
+    contact_infor = Column(String(255))
+
 
     def to_dict(self):
         """Converts the User instance to a dictionary."""
@@ -38,7 +42,10 @@ class User(Base):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "phone_number": self.phone_number,
-            "address": self.address
+            "address": self.address,
+            "company_name": self.company_name if self.role == 'employer' else None,
+            "website": self.website if self.role == 'employer' else None,
+            "contact_info": self.contact_info if self.role == 'employer' else None
         }
 
 
@@ -48,6 +55,18 @@ class User(Base):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         self.password = hashed_password.decode('utf-8')
 
-    def check_password(self, password):
-        """Verifies the provided password against the hashed password."""
-        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
+    def check_password(self, password: str) -> bool:
+        """
+        Verifies the provided password against the hashed password.
+
+        Args:
+            password (str): The plain text password to verify.
+
+        Returns:
+            bool: True if the password matches the hashed password, False otherwise.
+        """
+        try:
+            return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
+        except Exception as e:
+            print(f"Error checking password: {e}")
+            return False
