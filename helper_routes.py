@@ -2,19 +2,14 @@
 """
 JWT helper functions.
 """
-from flask import Flask, request, jsonify
 import os
 import jwt
 import datetime
 from functools import wraps
-from sqlalchemy.exc import SQLAlchemyError, NoResultFound
-from models.user import User
-from flask import Flask
+from flask import Flask, request, jsonify, current_app
 
 app = Flask(__name__)
-
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') 
-
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 def generate_token(user_id, username, role):
     """
@@ -41,7 +36,7 @@ def generate_token(user_id, username, role):
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     }
 
-    secret_key = app.config['SECRET_KEY']
+    secret_key = app.config['SECRET_KEY']  # Correctly reference the secret key
     token = jwt.encode(payload, secret_key, algorithm='HS256')
 
     return token
@@ -73,7 +68,7 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
         try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])  # Correctly reference the secret key
             current_user = {
                 'id': data['id'],
                 'username': data['username'],
