@@ -2,7 +2,7 @@
 """Restful api."""
 
 from flask import Flask, jsonify, request
-from falsk_cors import CORS
+from flask_cors import CORS
 from helper_routes import generate_token, token_required
 from db_operations import *
 
@@ -21,7 +21,7 @@ def index():
 
 """Define routes for user operations."""
 
-@app.route('/api/register', methods=['POST'], strictslashes=False)
+@app.route('/api/user/register', methods=['POST'], strict_slashes=False)
 def register():
     """
     Endpoint for the user registration.
@@ -29,14 +29,15 @@ def register():
     data = request.get_json()
     username = data['username']
     password = data['password']
+    email = data['email']
     role = data['role']
 
-    add_user_to_db(username, password, role)
+    add_user_to_db(username, password, email, role)
     
     return jsonify({'message': 'User registered successfully'}), 201
 
 
-@app.route('/api/user/login', methods=['POST'])
+@app.route('/api/user/login', methods=['POST'], strict_slashes=False)
 def login_user():
     """
     Endpoint for the user login.
@@ -59,7 +60,7 @@ def login_user():
         return jsonify({'token': token})
     return jsonify({'message': 'Invalid credentials'}), 401
 
-@app.route('/api/user/<int:id>', methods=['GET'])
+@app.route('/api/user/<int:id>', methods=['GET'], strict_slashes=False)
 def get_user_route(id):
     """Implement logic to get user by id."""
     user = get_user_by_id(id)
@@ -67,6 +68,9 @@ def get_user_route(id):
         return jsonify({'error': 'User not found'}), 404
     
     return jsonify(user.to_dict())
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 
 

@@ -5,16 +5,17 @@ Database operations.
 
 from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
-from base import session 
-from db_connector import session
+from base import Session
 from models.user import User
 from sqlalchemy.orm.exc import NoResultFound
 
 session = Session()
 
+user = User()
+
 """user routes."""
 
-def add_user_to_db(username, password, role):
+def add_user_to_db(username, password, email, role, company_name=None):
     """
     Register a new user in the database.
 
@@ -22,6 +23,8 @@ def add_user_to_db(username, password, role):
     - username (str): The username of the new user.
     - password (str): The plain text password of the new user.
     - role (str): The role assigned to the new user.
+    - email(str): The email of the new user.
+    - company_name(str): The company name for employers.
 
     Returns:
     - None
@@ -33,10 +36,12 @@ def add_user_to_db(username, password, role):
     creates a new `User` object with the provided username, hashed password, and role, 
     and then adds this new user to the database session and commits the transaction.
     """
-    hashed_password = generate_password_hash(password)
-    new_user = User(username=username, password=hashed_password, role=role)
-    db.session.add(new_user)
-    db.session.commit()
+    new_user = User(username=username, email=email, role=role)
+    new_user.set_password(password)
+    if role == 'employer' and company_name is not None:
+        new_user.company_name = company_name
+    session.add(new_user)
+    session.commit()
 
 def get_user_by_username(username):
     """
@@ -59,7 +64,8 @@ def get_user_by_username(username):
     are found, or if a database error occurs, it returns `None`.
     """
     try:
-        return User.query.filter_by(username=username).one()
+        user = session.query(User).filter_by(username=username).one()
+        return user
     except NoResultFound:
         return None
     except MultipleResultsFound:
@@ -82,7 +88,7 @@ def get_user_by_id(id):
     - NoResultFound: Exception when no user is found with the given ID.
     """
     try:
-        user = User.query.get_or_404(id)
+        user = session.query(User).get(id)
         return user
     except NoResultFound:
         return None

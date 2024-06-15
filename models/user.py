@@ -2,7 +2,8 @@
 """ holds class Users"""
 
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, ForeignKey, case
+from sqlalchemy.schema import ColumnDefault
 from sqlalchemy.orm import relationship
 from base import Base
 import bcrypt
@@ -24,7 +25,10 @@ class User(Base):
     last_name = Column(String(50))
     phone_number = Column(String(15))
     address = Column(String(255))
-    company_name = Column(String(100))
+    company_name = Column(String(100), nullable=True, server_default=case(
+        (role == 'job_seeker', None),
+        else_=None
+    ))
     website = Column(String(255))
     contact_infor = Column(String(255))
 
@@ -45,7 +49,7 @@ class User(Base):
             "address": self.address,
             "company_name": self.company_name if self.role == 'employer' else None,
             "website": self.website if self.role == 'employer' else None,
-            "contact_info": self.contact_info if self.role == 'employer' else None
+            "contact_infor": self.contact_infor if self.role == 'employer' else None
         }
 
 

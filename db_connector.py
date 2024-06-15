@@ -7,7 +7,6 @@ from base import Base, engine
 from models.user import User
 from models.job import Job
 from models.application import Application
-from models.employee import Employee
 
 """ Create a session factory."""
 Session = sessionmaker(bind=engine)
