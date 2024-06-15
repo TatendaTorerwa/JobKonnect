@@ -3,7 +3,7 @@
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from helper_routes import generate_token, token_required
+from jwtfunc import generate_token, token_required
 from db_operations import *
 
 
