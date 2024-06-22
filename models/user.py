@@ -21,16 +21,13 @@ class User(Base):
     role = Column(Enum('job_seeker', 'employer', name='role_enum'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, server_default=sqlalchemy.func.now())
     updated_at = Column(TIMESTAMP, nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now())
-    first_name = Column(String(50))
-    last_name = Column(String(50))
-    phone_number = Column(String(15))
-    address = Column(String(255))
-    company_name = Column(String(100), nullable=True, server_default=case(
-        (role == 'job_seeker', None),
-        else_=None
-    ))
-    website = Column(String(255))
-    contact_infor = Column(String(255))
+    first_name = Column(String(50), nullable=True)
+    last_name = Column(String(50), nullable=True)
+    phone_number = Column(String(15), nullable=False)
+    address = Column(String(255), nullable=True)
+    company_name = Column(String(100), nullable=True)
+    website = Column(String(255), nullable=True)
+    contact_infor = Column(String(255), nullable=True)
 
 
     def to_dict(self):
@@ -43,14 +40,29 @@ class User(Base):
             "role": self.role,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "first_name": self.first_name,
-            "last_name": self.last_name,
+            "first_name": self.first_name if self.role == 'job_seeker' else None,
+            "last_name": self.last_name if self.role == 'job_seeker' else None,
             "phone_number": self.phone_number,
             "address": self.address,
             "company_name": self.company_name if self.role == 'employer' else None,
             "website": self.website if self.role == 'employer' else None,
             "contact_infor": self.contact_infor if self.role == 'employer' else None
         }
+
+    def validate_role_specific_fields(self):
+        """Ensures appropriate fields are filled out
+        based on whether the user is a job seeker or employer."""
+        if self.role == 'job_seeker':
+            if not self.first_name or not self.last_name:
+                raise ValueError("Job seekers must have a first name and last name.")
+            self.company_name = None
+            self.website = None
+            self.contact_infor = None
+        elif self.role == 'employer':
+            if not self.company_name or not self.website:
+                raise ValueError("Employers must have a company name and website.")
+            self.first_name = None
+            self.last_name = None
 
 
     def set_password(self, password):
