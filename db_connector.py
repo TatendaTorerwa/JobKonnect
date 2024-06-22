@@ -11,5 +11,11 @@ from models.application import Application
 """ Create a session factory."""
 Session = sessionmaker(bind=engine)
 
-"""Create database tables based on the defined models."""
-Base.metadata.create_all(engine)
+def create_tables():
+    """Create all tables in the database."""
+    Base.metadata.create_all(bind=engine)
+
+if __name__ == "__main__":
+    """If this script is run directly, create all tables in the database."""
+    create_tables()
+    print("Tables created successfully.")
