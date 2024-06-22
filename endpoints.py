@@ -81,7 +81,8 @@ def login():
         token = generate_token(user.id, user.username, user.role)
         return jsonify({
             'user_id': user.id,
-            'token': token
+            'token': token,
+            'role': user.role
         })
     return jsonify({'message': 'Invalid credentials'}), 401
 
