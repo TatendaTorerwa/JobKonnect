@@ -23,11 +23,16 @@ try:
 except Exception as e:
     print('db not connected:', e)
 
-"""Create a session factory."""
-Session = sessionmaker(bind=engine)
-
-"""Create a Session instance that will be used across the application."""
-session = scoped_session(Session)
+"""Create a scope_session factory."""
+SessionLocal = scoped_session(sessionmaker(bind=engine))
 
 """Base class for declarative ORM models."""
 Base = declarative_base()
+
+"""Function to create all tables."""
+def create_all_tables():
+    Base.metadata.create_all(bind=engine)
+
+"""Function to drop all tables."""
+def drop_all_tables():
+    Base.metadata.drop_all(bind=engine)
