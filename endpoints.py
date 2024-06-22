@@ -26,19 +26,41 @@ def register():
     """
     Endpoint for the user registration.
     """
+    """Extract data from JSON request."""
     data = request.get_json()
-    username = data['username']
-    password = data['password']
-    email = data['email']
-    role = data['role']
+    username = data.get('username')
+    password = data.get('password')
+    email = data.get('email')
+    role = data.get('role')
+    phone_number = data.get('phone_number')
+    address = data.get('address')
+    first_name = data.get('first_name', None)
+    last_name = data.get('last_name', None)
+    company_name = data.get('company_name', None)
+    website = data.get('website', None)
+    contact_infor= data.get('contact_infor', None)
 
-    add_user_to_db(username, password, email, role)
+    """Validate required fields based on role."""
+    if role == 'job_seeker' and (not first_name or not last_name):
+        return jsonify({'error': 'First name and last name are required for job seekers'}), 400
+    elif role == 'employer' and (not company_name or not website):
+        return jsonify({'error': 'Company name and website are required for employers'}), 400
+
+    try:
+        """Call register_user function to add user to database."""
+        register_user(username, password, email, role, phone_number, address,
+                      first_name=first_name, last_name=last_name,
+                      company_name=company_name, website=website, contact_infor=contact_infor)
+
+        return jsonify({'message': 'User registered successfully'}), 201
+    except ValueError as ve:
+        return jsonify({'error': str(ve)}), 400
+    except SQLAlchemyError as se:
+        return jsonify({'error': f'Failed to register user: {str(se)}'}), 500
     
-    return jsonify({'message': 'User registered successfully'}), 201
-
 
 @app.route('/api/user/login', methods=['POST'], strict_slashes=False)
-def login_user():
+def login():
     """
     Endpoint for the user login.
     """
@@ -46,18 +68,21 @@ def login_user():
     if not data:
         return jsonify({'error': 'No data provided'}), 400
 
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
 
-    # Validate input
-    if not username or not password:
-        return jsonify({'error': 'Missing username or password'}), 400
+    """Validate input."""
+    if not email or not password:
+        return jsonify({'error': 'Missing email or password'}), 400
 
-    # Query the user from the database
-    user = get_user_by_username(username)
-    if user and user.check_password(password):
+    """Query the user from the database."""
+    user = login_user(email, password)
+    if user:
         token = generate_token(user.id, user.username, user.role)
-        return jsonify({'token': token})
+        return jsonify({
+            'user_id': user.id,
+            'token': token
+        })
     return jsonify({'message': 'Invalid credentials'}), 401
 
 @app.route('/api/user/<int:id>', methods=['GET'], strict_slashes=False)
@@ -71,23 +96,6 @@ def get_user_route(id):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
