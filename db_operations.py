@@ -44,7 +44,7 @@ def register_user(username, password, email, role, phone_number, address,
     creates a new `User` object with the provided username, hashed password, and role, 
     and then adds this new user to the database session and commits the transaction.
     """
-    new_user = new_user = User(
+    new_user = User(
         username=username,
         email=email,
         role=role,
