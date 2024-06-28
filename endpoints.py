@@ -78,11 +78,13 @@ def login():
     """Query the user from the database."""
     user = login_user(email, password)
     if user:
-        token = generate_token(user.id, user.username, user.role)
+        token, expiration = generate_token(user.id, user.username, user.role)
+        print(f"Token: {token}, Expiration: {expiration}")
         return jsonify({
             'user_id': user.id,
             'token': token,
-            'role': user.role
+            'role': user.role,
+            'token_expiration': expiration
         })
     return jsonify({'message': 'Invalid credentials'}), 401
 

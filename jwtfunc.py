@@ -29,17 +29,18 @@ def generate_token(user_id, username, role):
     This function encodes the user_id, username, and role into a JWT token
     using a secret key configured in the Flask application (`app.config['SECRET_KEY']`).
     """
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     payload = {
         'id': user_id,
         'username': username,
         'role': role,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        'exp': expiration
     }
 
     secret_key = app.config['SECRET_KEY']  # Correctly reference the secret key
     token = jwt.encode(payload, secret_key, algorithm='HS256')
 
-    return token
+    return token, expiration.isoformat()
 
 
 def token_required(f):
