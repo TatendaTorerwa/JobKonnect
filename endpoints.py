@@ -11,6 +11,7 @@ from db_operations import *
 app = Flask(__name__)
 CORS(app)
 
+
 """Route handler for the root URL."""
 @app.route('/')
 def index():
@@ -20,6 +21,7 @@ def index():
     return jsonify({'message': 'Welcome to JobKonnect.'})
 
 """Define routes for user operations."""
+
 
 @app.route('/api/user/register', methods=['POST'], strict_slashes=False)
 def register():
@@ -88,6 +90,7 @@ def login():
         })
     return jsonify({'message': 'Invalid credentials'}), 401
 
+
 @app.route('/api/user/<int:id>', methods=['GET'], strict_slashes=False)
 def get_user_route(id):
     """Implement logic to get user by id."""
@@ -96,6 +99,60 @@ def get_user_route(id):
         return jsonify({'error': 'User not found'}), 404
     
     return jsonify(user.to_dict())
+
+"""Define routes for Job operations."""
+
+
+@app.route('/api/jobs', methods=['GET'])
+def get_jobs():
+    """Delete job listing by ID."""
+    jobs_list = get_all_jobs()
+    if jobs_list is not None:
+        return jsonify(jobs_list), 200
+    else:
+        return jsonify({'error': 'Failed to retrieve jobs'}), 500
+
+
+@app.route('/api/jobs', methods=['POST'])
+def create_new_job():
+    """Create a new job listing."""
+    data = request.get_json()
+    job_id = create_job(data)
+    if job_id is not None:
+        return jsonify({'message': 'Job listing created successfully', 'job_id': job_id}), 201
+    else:
+        return jsonify({'error': 'Failed to create job listing'}), 500
+
+
+@app.route('/api/jobs/<int:job_id>', methods=['GET'])
+def get_job(job_id):
+    """Retrieve job details by ID."""
+    job_details = get_job_by_id(job_id)
+    if job_details:
+        return jsonify(job_details), 200
+    else:
+        return jsonify({'error': f'Job with ID {job_id} not found'}), 404
+
+
+@app.route('/api/jobs/<int:job_id>', methods=['PUT'])
+def update_job_by_id(job_id):
+    """Update job listing by ID."""
+    data = request.get_json()
+    success = update_job(job_id, data)
+    if success:
+        return jsonify({'message': 'Job listing updated successfully'}), 200
+    else:
+        return jsonify({'error': f'Failed to update job with ID {job_id}'}), 500
+
+
+@app.route('/api/jobs/<int:job_id>', methods=['DELETE'])
+def delete_job_by_id(job_id):
+    """Delete job listing by ID."""
+    success = delete_job(job_id)
+    if success:
+        return jsonify({'message': 'Job listing deleted successfully'}), 200
+    else:
+        return jsonify({'error': f'Failed to delete job with ID {job_id}'}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=False)

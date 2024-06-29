@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, Text, Enum, TIMESTAMP, Date, For
 from sqlalchemy.orm import relationship
 from base import Base
 from models.user import User
-from models.job import Job
+from models.job import Jobs
 from sqlalchemy.sql import func
 
 class Application(Base):

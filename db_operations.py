@@ -7,6 +7,7 @@ from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from base import SessionLocal
 from models.user import User
+from models.job import Job
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 
@@ -14,7 +15,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 user = User()
 
-"""user routes."""
+"""user database operations"""
 
 def register_user(username, password, email, role, phone_number, address,
                  first_name=None, last_name=None, company_name=None, website=None, contact_infor=None):
@@ -132,3 +133,136 @@ def get_user_by_id(id):
         return user
     except NoResultFound:
         return None
+
+"""Define Job database operations."""
+
+def get_all_jobs():
+    """
+    Retrieve all jobs from the database.
+
+    Returns:
+        list: A list of dictionaries representing each job, or None if there's an error.
+    """
+    try:
+        session = SessionLocal()
+        jobs = session.query(Job).all()
+        jobs_list = [job.to_dict() for job in jobs]
+        return jobs_list
+    except Exception as e:
+        print(f"Error retrieving jobs: {str(e)}")
+        return None
+
+
+def create_job(data):
+    """
+    Create a new job in the database.
+
+    Args:
+        data (dict): A dictionary containing job details.
+
+    Returns:
+        int or None: The ID of the newly created job if successful, None otherwise.
+    """
+    try:
+        new_job = Job(
+            title=data['title'],
+            description=data['description'],
+            requirements=data['requirements'],
+            employer_id=data['employer_id'],
+            salary=data['salary'],
+            location=data['location'],
+            job_type=data['job_type'],
+            application_deadline=data['application_deadline'],
+            skills_required=data['skills_required'],
+            preferred_qualifications=data['preferred_qualifications']
+        )
+        session = SessionLocal()
+        session.add(new_job)
+        session.commit()
+        return new_job.id
+    except Exception as e:
+        session.rollback()
+        print(f"Error creating job: {str(e)}")
+        return None
+
+
+def get_job_by_id(job_id):
+    """
+    Retrieve a job from the database by its ID.
+
+    Args:
+        job_id (int): The ID of the job to retrieve.
+
+    Returns:
+        dict or None: A dictionary representing the job details if found, None otherwise.
+    """
+    try:
+        session = SessionLocal()
+        job = session.query(Job).get(job_id)
+        if job:
+            return job.to_dict()
+        else:
+            print(f"Job with ID {job_id} not found.")
+            return None
+    except SQLAlchemyError as e:
+        print(f"Error retrieving job {job_id}: {str(e)}")
+        return None
+
+
+def update_job(job_id, data):
+    """
+    Update a job in the database.
+
+    Args:
+        job_id (int): The ID of the job to update.
+        data (dict): A dictionary containing updated job details.
+
+    Returns:
+        bool: True if the job was successfully updated, False otherwise.
+    """
+    try:
+        session = SessionLocal()
+        job = session.query(Job).get(job_id)
+        if job:
+            job.title = data['title']
+            job.description = data['description']
+            job.requirements = data['requirements']
+            job.salary = data['salary']
+            job.location = data['location']
+            job.job_type = data['job_type']
+            job.application_deadline = data['application_deadline']
+            job.skills_required = data['skills_required']
+            job.preferred_qualifications = data['preferred_qualifications']
+            session.commit()
+            return True
+        else:
+            return False
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error updating job {job_id}: {str(e)}")
+        return False
+
+def delete_job(job_id):
+    """
+    Delete a job from the database.
+
+    Args:
+        job_id (int): The ID of the job to delete.
+
+    Returns:
+        bool: True if the job was successfully deleted, False otherwise.
+    """
+    try:
+        session = SessionLocal()
+        job = session.query(Job).get(job_id)
+        if job:
+            session.delete(job)
+            session.commit()
+            return True
+        else:
+            print(f"Job with ID {job_id} not found.")
+            return False
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error deleting job {job_id}: {str(e)}")
+        return False
